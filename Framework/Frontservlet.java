@@ -39,7 +39,7 @@ public class Frontservlet extends HttpServlet{
                 }
             }
         } catch (Exception e) {
-            // TODO: handle exception
+            e.printStackTrace();
         }
     }
 
