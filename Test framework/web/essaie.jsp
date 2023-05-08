@@ -1,3 +1,7 @@
+<%@page import="etu001935.model.Emp" %>
+<% 
+Emp[] employees =(Emp[]) request.getAttribute("all_emp");
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,6 +17,9 @@
                 <div class="card">
                     <div class="card-body">
                         <h1 class="card-title">teste reussi</h1>
+                        <%for(Emp employee : employees){%>
+                            <%=employee.getNom()%>
+                        <%}%>
                     </div>
                 </div>
             </div>

@@ -6,6 +6,23 @@ public class Emp {
     
     @Annotation(Url="Getall")
     public ModelView GetAll(){
-       return new ModelView("essaie.jsp");
+       ModelView view = new ModelView("essaie.jsp");
+        Emp[] emps ={
+            new Emp("Rakoto"),new Emp("Rabe"),new Emp("Rasoa")
+        };  
+        view.AddItem("all_emp",emps);
+        return view;
+    }
+    public String getNom() {
+        return nom;
+    }
+
+    public Emp(){}
+
+    public void setNom(String newname) {
+        this.nom = newname;
+    }
+    public Emp(String name) {
+        setNom(name);
     }
 }

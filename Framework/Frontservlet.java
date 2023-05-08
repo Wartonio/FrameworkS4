@@ -6,6 +6,7 @@ import jakarta.servlet.*;
 import java.io.*;
 import jakarta.servlet.http.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 import javax.management.modelmbean.ModelMBean;
 
@@ -55,33 +56,42 @@ public class Frontservlet extends HttpServlet{
         for(Map.Entry<String,Mapping> sets : this.MappingUrls.entrySet()) {
             out.println("(url ==>'"+ sets.getKey() +"')");
         }
-        if(this.MappingUrls.containsKey(url)){
-            try {
-                Mapping map = this.MappingUrls.get(url);
-            Class c = Class.forName(map.getClassName());
-            Method m = null;
-            Method[] methods = c.getDeclaredMethods();
-            for(Method method : methods){
-                if(method.isAnnotationPresent(Annotation.class)){
-                    Annotation note = method.getAnnotation(Annotation.class);
-                    if(!note.Url().isEmpty() && note.Url()!=null){
-                        if(method.getName().equals(map.getMethod())){
-                            m = method;
-                            break;
+        try{
+            if(this.MappingUrls.containsKey(url)){
+                try {
+                    Mapping map = this.MappingUrls.get(url);
+                Class c = Class.forName(map.getClassName());
+                Method m = null;
+                Method[] methods = c.getDeclaredMethods();
+                for(Method method : methods){
+                    if(method.isAnnotationPresent(Annotation.class)){
+                        Annotation note = method.getAnnotation(Annotation.class);
+                        if(!note.Url().isEmpty() && note.Url()!=null){
+                            if(method.getName().equals(map.getMethod())){
+                                m = method;
+                                out.println(m);
+                                break;
+                            }
                         }
                     }
                 }
+                Object o = c.getConstructor().newInstance();
+                Object obj = m.invoke( o , (Object[])null);
+                if(obj instanceof ModelView){
+                    ModelView mv = (ModelView)obj;
+                    for(Map.Entry<String,Object> e : mv.getData().entrySet()){
+                        request.setAttribute(e.getKey(), e.getValue());
+                    }
+                    RequestDispatcher rd = request.getRequestDispatcher(mv.getUrl());
+                    rd.forward(request,response);
+                }
+                } catch (Exception e) {
+                    e.printStackTrace(out);
+                    // TODO: handle exception
+                }
             }
-            Object o = c.getConstructor().newInstance();
-            Object obj=m.invoke(o);
-            if(obj instanceof ModelView){
-                ModelView mv = (ModelView)obj;
-                RequestDispatcher rd = request.getRequestDispatcher(mv.getUrl());
-                rd.forward(request,response);
-            }
-            } catch (Exception e) {
-                // TODO: handle exception
-            }
+        }catch(Exception e){
+            e.printStackTrace(out);
         }
     }
     public void doGet(HttpServletRequest request,HttpServletResponse response) throws ServletException,IOException{
