@@ -3,6 +3,7 @@ import etu001935.framework.annotation.*;
 import etu001935.modelView.ModelView;
 import java.sql.Date;
 import etu001935.framework.Upload;
+@Scope(name="huhu")
 public class Emp {
     Integer id;
     String nom;
