@@ -24,5 +24,8 @@ public class Emp {
     }
     public Emp(String name) {
         setNom(name);
+
+
+
     }
 }
