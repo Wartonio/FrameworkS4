@@ -8,7 +8,7 @@ public class Emp {
     public ModelView GetAll(){
        ModelView view = new ModelView("essaie.jsp");
         Emp[] emps ={
-            new Emp("Rakoto"),new Emp("Rabe"),new Emp("Rasoa")
+            new Emp("Rakoto"),new Emp("Rabe"),new Emp("Rasoa"),this
         };  
         view.AddItem("all_emp",emps);
         return view;
