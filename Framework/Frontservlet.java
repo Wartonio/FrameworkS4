@@ -4,6 +4,8 @@ import etu001935.framework.annotation.*;
 import etu001935.modelView.ModelView;
 import jakarta.servlet.*;
 import java.io.*;
+import java.io.ObjectInputStream.GetField;
+
 import jakarta.servlet.http.*;
 import java.util.*;
 import java.util.Map.Entry;
@@ -62,6 +64,7 @@ public class Frontservlet extends HttpServlet{
                     Mapping map = this.MappingUrls.get(url);
                 Class c = Class.forName(map.getClassName());
                 Method m = null;
+                Object o = c.getConstructor().newInstance();
                 Method[] methods = c.getDeclaredMethods();
                 for(Method method : methods){
                     if(method.isAnnotationPresent(Annotation.class)){
@@ -75,7 +78,23 @@ public class Frontservlet extends HttpServlet{
                         }
                     }
                 }
-                Object o = c.getConstructor().newInstance();
+                Enumeration<String> enu=request.getParameterNames();
+                List<String> list= Collections.list(enu);
+                Field[] fields=c.getFields(); 
+                for (Field field : fields){
+                    for(String li:list){
+                        if(field.getName().equals(li)){
+                            String name=field.getName();
+                            String first=name.substring(0,1).toUpperCase();
+                            String last=name.substring(2);
+                            Method mth=c.getMethod("set"+ first +last,field.getType());
+                            Object ob=request.getParameter("name");
+                            
+                            mth.invoke(o,ob);
+                            break;
+                        }
+                    }
+                }
                 Object obj = m.invoke( o , (Object[])null);
                 if(obj instanceof ModelView){
                     ModelView mv = (ModelView)obj;
@@ -93,7 +112,9 @@ public class Frontservlet extends HttpServlet{
         }catch(Exception e){
             e.printStackTrace(out);
         }
+        
     }
+
     public void doGet(HttpServletRequest request,HttpServletResponse response) throws ServletException,IOException{
         processRequest(request,response);
     }
