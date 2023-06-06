@@ -80,17 +80,26 @@ public class Frontservlet extends HttpServlet{
                 }
                 Enumeration<String> enu=request.getParameterNames();
                 List<String> list= Collections.list(enu);
-                Field[] fields=c.getFields(); 
+                Field[] fields=c.getDeclaredFields(); 
                 for (Field field : fields){
+                    String name=(field.getType().isArray()) ? field.getName()+"[]" : field.getName();
                     for(String li:list){
-                        if(field.getName().equals(li)){
-                            String name=field.getName();
-                            String first=name.substring(0,1).toUpperCase();
-                            String last=name.substring(2);
+                        if(name.equals(li)){
+                            // (condition) ? valeur1 : valeur2 -> condition terner
+                            String z=field.getName();
+                            String first=z.substring(0,1).toUpperCase();
+                            String last=z.substring(1);
                             Method mth=c.getMethod("set"+ first +last,field.getType());
-                            Object ob=request.getParameter("name");
-                            
-                            mth.invoke(o,ob);
+                            Object ob =(field.getType().isArray())? request.getParameterValues(name) : request.getParameter(name);
+                            out.println(ob);
+                            Object oj = null;
+                            if(field.getType()==java.sql.Date.class){
+                                oj=java.sql.Date.valueOf(String.valueOf(ob));
+                            }else if(field.getType().isArray())
+                                oj=ob;
+                            else
+                                oj=field.getType().getConstructor(String.class).newInstance(String.valueOf(ob));
+                            mth.invoke( o , oj );
                             break;
                         }
                     }

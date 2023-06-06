@@ -19,6 +19,11 @@ Emp[] employees =(Emp[]) request.getAttribute("all_emp");
                         <h1 class="card-title">teste reussi</h1>
                         <%for(Emp employee : employees){%>
                             <%=employee.getNom()%>
+                            <%=employee.getId()%>
+                            <%=employee.getDate()%>
+                            <%for(int i = 0;employee.getJours()!= null && i<employee.getJours().length; i++) {%>
+                                <%= employee.getJours()[i]%>
+                            <%}%>
                         <%}%>
                     </div>
                 </div>

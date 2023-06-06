@@ -1,4 +1,4 @@
-<%@page import="etu001935.framework.servlet.Frontservet" %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +8,9 @@
     <title>Document</title>
 </head>
 <body>
-    Nom : <input type="text" name="nom"> 
+        <form action="Getall" method="post">
+            Nom : <input type="text" name="nom"> 
+            <input type="submit" value="ok">
+        </form>
 </body>
 </html>
