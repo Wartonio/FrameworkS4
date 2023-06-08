@@ -17,6 +17,13 @@ public class Emp {
         view.AddItem("all_emp",emps);
         return view;
     }
+    @Annotation(Url="FindById")
+    public ModelView findById(@Param(nom = "anarana") Integer id) {
+        ModelView view = new ModelView("Sprint8.jsp");
+        view.AddItem("Id",id);
+        return view;
+        
+    }
     public String[] getJours(){
         return jours;
     }
