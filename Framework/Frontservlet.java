@@ -80,6 +80,30 @@ public class Frontservlet extends HttpServlet{
                 }
                 Enumeration<String> enu=request.getParameterNames();
                 List<String> list= Collections.list(enu);
+                Parameter[] params = m.getParameters();
+                Object[] objt=new Object[params.length];
+                for (int i = 0; i < params.length; i++) {
+                    Parameter p=params[i];
+                    Param value=p.getAnnotation(Param.class);
+                    String  n = value.nom();
+                    for(String li:list){
+                        if(n.equals(li)){
+
+                            Object ob =(p.getType().isArray())? request.getParameterValues(n) : request.getParameter(n);
+                            Object oj = null;
+                            if(p.getType()==java.sql.Date.class){
+                                oj=java.sql.Date.valueOf(String.valueOf(ob));
+                            }else if(p.getType().isArray())
+                            oj=ob;
+                            else
+                            oj=p.getType().getConstructor(String.class).newInstance(String.valueOf(ob));
+                            objt[i]=oj;
+                            out.println(oj);
+                            break;
+                        }
+                    }
+                }
+
                 Field[] fields=c.getDeclaredFields(); 
                 for (Field field : fields){
                     String name=(field.getType().isArray()) ? field.getName()+"[]" : field.getName();
@@ -104,7 +128,7 @@ public class Frontservlet extends HttpServlet{
                         }
                     }
                 }
-                Object obj = m.invoke( o , (Object[])null);
+                Object obj = m.invoke( o ,objt);
                 if(obj instanceof ModelView){
                     ModelView mv = (ModelView)obj;
                     for(Map.Entry<String,Object> e : mv.getData().entrySet()){
