@@ -24,6 +24,7 @@ Emp[] employees =(Emp[]) request.getAttribute("all_emp");
                             <%for(int i = 0;employee.getJours()!= null && i<employee.getJours().length; i++) {%>
                                 <%= employee.getJours()[i]%>
                             <%}%>
+                            <%=employee.getFileUpload().getFilename()%>
                         <%}%>
                     </div>
                 </div>

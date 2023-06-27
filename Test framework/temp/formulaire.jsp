@@ -8,14 +8,15 @@
     <title>Document</title>
 </head>
 <body>
-        <form action="Getall" method="post">
-            Nom : <input type="text" name="nom"> 
-            Num : <input type="text" name="id">
-            Date de naissance : <input type="date" name="date">
-            <input type="checkbox" name="jours[]" value="lundi">
-            <input type="checkbox" name="jours[]" value="mardi">
-            <input type="checkbox" name="jours[]" value="jeudi">
-            <input type="submit" value="ok">
-        </form>
+    <form action="Getall" method="post" enctype="multipart/form-data">
+        Nom : <input type="text" name="nom"> 
+        Num : <input type="text" name="id">
+        Date de naissance : <input type="date" name="date">
+        <input type="checkbox" name="jours[]" value="lundi">
+        <input type="checkbox" name="jours[]" value="mardi">
+        <input type="checkbox" name="jours[]" value="jeudi">
+        <input type="file" name="fileUpload">
+        <input type="submit" value="ok">
+    </form>
 </body>
 </html>

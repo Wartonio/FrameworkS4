@@ -7,6 +7,7 @@ import java.io.*;
 import java.io.ObjectInputStream.GetField;
 
 import jakarta.servlet.http.*;
+import jakarta.servlet.annotation.*;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -15,6 +16,7 @@ import javax.management.modelmbean.ModelMBean;
 import java.net.*;
 import java.lang.reflect.*;
 
+@MultipartConfig
 public class Frontservlet extends HttpServlet{
     HashMap<String,Mapping> MappingUrls;
 
@@ -128,9 +130,27 @@ public class Frontservlet extends HttpServlet{
                         }
                     }
                 }
-                Object obj = m.invoke( o ,objt);
+                try {
+                    for (Field field : fields){
+                        if ( field.getType() == etu001935.framework.Upload.class) {
+                            String z=field.getName();
+                            String first=z.substring(0,1).toUpperCase();
+                            String last=z.substring(1);
+                            Method mth = c.getDeclaredMethod("set"+ first +last, field.getType() );
+                            Object objct = this.fileTraitement(request.getParts(), field);
+                            mth.invoke(o, objct);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace(out);
+                    e.printStackTrace();
+                    // TODO: handle exception
+                }
+
+                Object obj = m.invoke( o, objt);
+
                 if(obj instanceof ModelView){
-                    ModelView mv = (ModelView)obj;
+                    ModelView mv = (ModelView) obj;
                     for(Map.Entry<String,Object> e : mv.getData().entrySet()){
                         request.setAttribute(e.getKey(), e.getValue());
                     }
@@ -146,6 +166,46 @@ public class Frontservlet extends HttpServlet{
             e.printStackTrace(out);
         }
         
+    }
+    private String getFileName(jakarta.servlet.http.Part part) {
+        String contentDisposition = part.getHeader("content-disposition");
+        String[] parts = contentDisposition.split(";");
+        for (String partStr : parts) {
+            if (partStr.trim().startsWith("filename"))
+                return partStr.substring(partStr.indexOf('=') + 1).trim().replace("\"", "");
+        }
+        return null;
+    }
+    private Upload fillFileUpload( Upload file, jakarta.servlet.http.Part filepart ){
+        try (InputStream io = filepart.getInputStream()) {
+            ByteArrayOutputStream buffers = new ByteArrayOutputStream();
+            byte[] buffer = new byte[(int) filepart.getSize()];
+            int read;
+            while ((read = io.read(buffer, 0, buffer.length)) != -1) {
+                buffers.write(buffer, 0, read);
+            }
+            file.setFilename(this.getFileName(filepart));
+            file.setData(buffers.toByteArray());
+            return file;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public  Upload fileTraitement( Collection<jakarta.servlet.http.Part> files, Field field ){
+        Upload file = new Upload();
+        String name = field.getName();
+        boolean exists = false;
+        String filename = null;
+        jakarta.servlet.http.Part filepart = null;
+        for (jakarta.servlet.http.Part part : files) {
+            if (part.getName().equals(name)) {
+                filepart = part;
+                break;
+            }
+        }
+        file = this.fillFileUpload(file, filepart);
+        return file;
     }
 
     public void doGet(HttpServletRequest request,HttpServletResponse response) throws ServletException,IOException{
