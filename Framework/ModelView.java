@@ -5,7 +5,7 @@ import java.util.HashMap;
 public class ModelView {
     String url;
     HashMap<String,Object> data = new HashMap<String,Object>(); 
-
+    HashMap<String,Object> session = new HashMap<String,Object>();
   
     public ModelView() {
 
@@ -27,7 +27,16 @@ public class ModelView {
     public void setData(HashMap<String,Object> newdata) {
         this.data = newdata;
     }
+    public HashMap<String, Object> getSession() {
+        return session;
+    }
+    public void setSession(HashMap<String, Object> session) {
+        this.session = session;
+    }
     public ModelView(String url) {
         this.setUrl(url);
+    }
+    public void addSession(String session,Object object){
+        this.getSession().put( session , object );
     }
 }

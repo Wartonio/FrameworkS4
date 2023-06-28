@@ -21,6 +21,8 @@ import java.lang.reflect.*;
 public class Frontservlet extends HttpServlet {
     HashMap<String, Mapping> MappingUrls;
     HashMap<String, Object> singletons;
+    String is;
+    String au;
 
     public HashMap<String, Object> getSingletons() {
         return this.singletons;
@@ -31,6 +33,10 @@ public class Frontservlet extends HttpServlet {
             super.init();
             // String packages = String.valueOf(getInitParameter("packages"));
             String packages = "etu001935.model";
+            String ins = String.valueOf(getInitParameter("isconnected"));
+            String auth = String.valueOf(getInitParameter("profile"));
+            this.is = ins;
+            this.au = auth;
             this.MappingUrls = new HashMap<>();
             this.singletons = new HashMap<>();
             String path = packages.replaceAll("[.]", "\\\\");
@@ -71,7 +77,7 @@ public class Frontservlet extends HttpServlet {
         String url = request.getRequestURI();
         url = url.substring(request.getContextPath().length() + 1);
         for (Map.Entry<String, Mapping> sets : this.MappingUrls.entrySet()) {
-            // out.println("(url ==>'" + sets.getKey() + "')");
+            out.println("(url ==>'" + sets.getKey() + "')");
         }
         try {
             if (this.MappingUrls.containsKey(url)) {
@@ -82,14 +88,14 @@ public class Frontservlet extends HttpServlet {
                     Object o = null;
                     if (singletons.containsKey(map.getClassName())) {
                         if (singletons.get(map.getClassName()) == null) {
-                            singletons.put(map.getClassName(), c.getConstructor((Class[])null).newInstance());
-                             
+                            singletons.put(map.getClassName(), c.getConstructor((Class[]) null).newInstance());
+
                         }
                         o = singletons.get(map.getClassName());
-                        // out.println("tsy tay");
+                        out.println("tay");
                     } else {
-                        o = c.getConstructor((Class[])null).newInstance();
-                        // out.println(" tay");
+                        o = c.getConstructor((Class[]) null).newInstance();
+                        out.println("tsy tay");
                     }
                     Method[] methods = c.getDeclaredMethods();
                     for (Method method : methods) {
@@ -98,10 +104,21 @@ public class Frontservlet extends HttpServlet {
                             if (!note.Url().isEmpty() && note.Url() != null) {
                                 if (method.getName().equals(map.getMethod())) {
                                     m = method;
-                                    // out.println(m);
+                                    out.println(m);
                                     break;
                                 }
                             }
+                        }
+                    }
+                    if (m.isAnnotationPresent(Authantification.class)) {
+                        if (request.getSession().getAttribute(this.is) != null) {
+                            Authantification note = m.getAnnotation(Authantification.class);
+                            if (note.user() != null && note.user().length() > 0
+                                    && !note.user().equals(request.getSession().getAttribute(this.au))) {
+                                throw new Exception("tsy azo ampiasainao io");
+                            }
+                        } else {
+                            throw new Exception("Tsymbola azo idirina");
                         }
                     }
                     Enumeration<String> enu = request.getParameterNames();
@@ -125,13 +142,13 @@ public class Frontservlet extends HttpServlet {
                                 else
                                     oj = p.getType().getConstructor(String.class).newInstance(String.valueOf(ob));
                                 objt[i] = oj;
-                                // out.println(oj);
+                                out.println(oj);
                                 break;
                             }
                         }
                     }
-                    out.print("singleton"+this.getSingletons());
-                    
+                    out.print("singleton" + this.getSingletons());
+
                     Field[] fields = c.getDeclaredFields();
                     for (Field field : fields) {
                         String name = (field.getType().isArray()) ? field.getName() + "[]" : field.getName();
@@ -144,7 +161,7 @@ public class Frontservlet extends HttpServlet {
                                 Method mth = c.getMethod("set" + first + last, field.getType());
                                 Object ob = (field.getType().isArray()) ? request.getParameterValues(name)
                                         : request.getParameter(name);
-                                // out.println(ob);
+                                out.println(ob);
                                 Object oj = null;
                                 if (field.getType() == java.sql.Date.class) {
                                     oj = java.sql.Date.valueOf(String.valueOf(ob));
@@ -155,7 +172,7 @@ public class Frontservlet extends HttpServlet {
                                 if (c.isAnnotationPresent(Scope.class)
                                         && ((Scope) c.getAnnotation(Scope.class)).name()
                                                 .equalsIgnoreCase("singleton")) {
-                                        mth.invoke(o, (Object)null);
+                                    mth.invoke(o, (Object) null);
                                 }
                                 mth.invoke(o, oj);
                                 break;
@@ -171,9 +188,9 @@ public class Frontservlet extends HttpServlet {
                                 Method mth = c.getDeclaredMethod("set" + first + last, field.getType());
                                 Object objct = this.fileTraitement(request.getParts(), field);
                                 if (c.isAnnotationPresent(Scope.class)
-                                    && ((Scope) c.getAnnotation(Scope.class)).name()
-                                            .equalsIgnoreCase("singleton")) {
-                                    mth.invoke(o, (Object)null);
+                                        && ((Scope) c.getAnnotation(Scope.class)).name()
+                                                .equalsIgnoreCase("singleton")) {
+                                    mth.invoke(o, (Object) null);
                                 }
                                 mth.invoke(o, objct);
                             }
@@ -184,7 +201,6 @@ public class Frontservlet extends HttpServlet {
                         // TODO: handle exception
                     }
 
-                    
                     Object obj = m.invoke(o, objt);
 
                     if (obj instanceof ModelView) {
@@ -192,11 +208,15 @@ public class Frontservlet extends HttpServlet {
                         for (Map.Entry<String, Object> e : mv.getData().entrySet()) {
                             request.setAttribute(e.getKey(), e.getValue());
                         }
+                        for (Map.Entry<String, Object> e : mv.getSession().entrySet()) {
+                            request.getSession().setAttribute(e.getKey(), e.getValue());
+                        }
                         RequestDispatcher rd = request.getRequestDispatcher(mv.getUrl());
                         rd.forward(request, response);
                     }
                 } catch (Exception e) {
                     e.printStackTrace(out);
+                    e.printStackTrace();
                     // TODO: handle exception
                 }
             }
