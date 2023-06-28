@@ -21,6 +21,8 @@ import java.lang.reflect.*;
 public class Frontservlet extends HttpServlet {
     HashMap<String, Mapping> MappingUrls;
     HashMap<String, Object> singletons;
+    String is;
+    String au;
 
     public HashMap<String, Object> getSingletons() {
         return this.singletons;
@@ -31,6 +33,10 @@ public class Frontservlet extends HttpServlet {
             super.init();
             // String packages = String.valueOf(getInitParameter("packages"));
             String packages = "etu001935.model";
+            String ins = String.valueOf(getInitParameter("isconnected"));
+            String auth = String.valueOf(getInitParameter("profile"));
+            this.is = ins;
+            this.au = auth;
             this.MappingUrls = new HashMap<>();
             this.singletons = new HashMap<>();
             String path = packages.replaceAll("[.]", "\\\\");
@@ -82,13 +88,13 @@ public class Frontservlet extends HttpServlet {
                     Object o = null;
                     if (singletons.containsKey(map.getClassName())) {
                         if (singletons.get(map.getClassName()) == null) {
-                            singletons.put(map.getClassName(), c.getConstructor((Class[])null).newInstance());
-                             
+                            singletons.put(map.getClassName(), c.getConstructor((Class[]) null).newInstance());
+
                         }
                         o = singletons.get(map.getClassName());
                         out.println("tay");
                     } else {
-                        o = c.getConstructor((Class[])null).newInstance();
+                        o = c.getConstructor((Class[]) null).newInstance();
                         out.println("tsy tay");
                     }
                     Method[] methods = c.getDeclaredMethods();
@@ -102,6 +108,17 @@ public class Frontservlet extends HttpServlet {
                                     break;
                                 }
                             }
+                        }
+                    }
+                    if (m.isAnnotationPresent(Authantification.class)) {
+                        if (request.getSession().getAttribute(this.is) != null) {
+                            Authantification note = m.getAnnotation(Authantification.class);
+                            if (note.user() != null && note.user().length() > 0
+                                    && !note.user().equals(request.getSession().getAttribute(this.au))) {
+                                throw new Exception("tsy azo ampiasainao io");
+                            }
+                        } else {
+                            throw new Exception("Tsymbola azo idirina");
                         }
                     }
                     Enumeration<String> enu = request.getParameterNames();
@@ -130,8 +147,8 @@ public class Frontservlet extends HttpServlet {
                             }
                         }
                     }
-                    out.print("singleton"+this.getSingletons());
-                    
+                    out.print("singleton" + this.getSingletons());
+
                     Field[] fields = c.getDeclaredFields();
                     for (Field field : fields) {
                         String name = (field.getType().isArray()) ? field.getName() + "[]" : field.getName();
@@ -155,7 +172,7 @@ public class Frontservlet extends HttpServlet {
                                 if (c.isAnnotationPresent(Scope.class)
                                         && ((Scope) c.getAnnotation(Scope.class)).name()
                                                 .equalsIgnoreCase("singleton")) {
-                                        mth.invoke(o, (Object)null);
+                                    mth.invoke(o, (Object) null);
                                 }
                                 mth.invoke(o, oj);
                                 break;
@@ -171,9 +188,9 @@ public class Frontservlet extends HttpServlet {
                                 Method mth = c.getDeclaredMethod("set" + first + last, field.getType());
                                 Object objct = this.fileTraitement(request.getParts(), field);
                                 if (c.isAnnotationPresent(Scope.class)
-                                    && ((Scope) c.getAnnotation(Scope.class)).name()
-                                            .equalsIgnoreCase("singleton")) {
-                                    mth.invoke(o, (Object)null);
+                                        && ((Scope) c.getAnnotation(Scope.class)).name()
+                                                .equalsIgnoreCase("singleton")) {
+                                    mth.invoke(o, (Object) null);
                                 }
                                 mth.invoke(o, objct);
                             }
@@ -184,7 +201,6 @@ public class Frontservlet extends HttpServlet {
                         // TODO: handle exception
                     }
 
-                    
                     Object obj = m.invoke(o, objt);
 
                     if (obj instanceof ModelView) {
@@ -192,11 +208,15 @@ public class Frontservlet extends HttpServlet {
                         for (Map.Entry<String, Object> e : mv.getData().entrySet()) {
                             request.setAttribute(e.getKey(), e.getValue());
                         }
+                        for (Map.Entry<String, Object> e : mv.getSession().entrySet()) {
+                            request.getSession().setAttribute(e.getKey(), e.getValue());
+                        }
                         RequestDispatcher rd = request.getRequestDispatcher(mv.getUrl());
-                        // rd.forward(request, response);
+                        rd.forward(request, response);
                     }
                 } catch (Exception e) {
                     e.printStackTrace(out);
+                    e.printStackTrace();
                     // TODO: handle exception
                 }
             }

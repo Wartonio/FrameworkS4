@@ -3,7 +3,7 @@ import etu001935.framework.annotation.*;
 import etu001935.modelView.ModelView;
 import java.sql.Date;
 import etu001935.framework.Upload;
-@Scope(name="huhu")
+// @Scope(name="singleton")
 public class Emp {
     Integer id;
     String nom;
@@ -12,6 +12,7 @@ public class Emp {
     Upload fileUpload;
 
     @Annotation(Url="Getall")
+    @Authantification(user="admin")
     public ModelView GetAll(){
        ModelView view = new ModelView("essaie.jsp");
         Emp[] emps ={
@@ -63,4 +64,11 @@ public class Emp {
         this.fileUpload = upload;
     }
 
+    @Annotation(Url = "login")
+    public etu001935.modelView.ModelView login(){
+        etu001935.modelView.ModelView mv=new etu001935.modelView.ModelView("Sprint8.jsp");
+        mv.addSession("connecte","eny");
+        mv.addSession("user","admin");
+        return mv;
+    }
 }

@@ -3,6 +3,14 @@
     <servlet>
         <servlet-name>Servlet</servlet-name>
         <servlet-class>etu001935.framework.servlet.Frontservlet</servlet-class>
+        <init-param>
+            <param-name>isconnected</param-name>
+            <param-value>connecte</param-value>
+        </init-param>
+             <init-param>
+            <param-name>profile</param-name>
+            <param-value>user</param-value>
+        </init-param>
     </servlet>
  
    <servlet-mapping>
