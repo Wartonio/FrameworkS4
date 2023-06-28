@@ -71,7 +71,7 @@ public class Frontservlet extends HttpServlet {
         String url = request.getRequestURI();
         url = url.substring(request.getContextPath().length() + 1);
         for (Map.Entry<String, Mapping> sets : this.MappingUrls.entrySet()) {
-            out.println("(url ==>'" + sets.getKey() + "')");
+            // out.println("(url ==>'" + sets.getKey() + "')");
         }
         try {
             if (this.MappingUrls.containsKey(url)) {
@@ -86,10 +86,10 @@ public class Frontservlet extends HttpServlet {
                              
                         }
                         o = singletons.get(map.getClassName());
-                        out.println("tay");
+                        // out.println("tsy tay");
                     } else {
                         o = c.getConstructor((Class[])null).newInstance();
-                        out.println("tsy tay");
+                        // out.println(" tay");
                     }
                     Method[] methods = c.getDeclaredMethods();
                     for (Method method : methods) {
@@ -98,7 +98,7 @@ public class Frontservlet extends HttpServlet {
                             if (!note.Url().isEmpty() && note.Url() != null) {
                                 if (method.getName().equals(map.getMethod())) {
                                     m = method;
-                                    out.println(m);
+                                    // out.println(m);
                                     break;
                                 }
                             }
@@ -125,7 +125,7 @@ public class Frontservlet extends HttpServlet {
                                 else
                                     oj = p.getType().getConstructor(String.class).newInstance(String.valueOf(ob));
                                 objt[i] = oj;
-                                out.println(oj);
+                                // out.println(oj);
                                 break;
                             }
                         }
@@ -144,7 +144,7 @@ public class Frontservlet extends HttpServlet {
                                 Method mth = c.getMethod("set" + first + last, field.getType());
                                 Object ob = (field.getType().isArray()) ? request.getParameterValues(name)
                                         : request.getParameter(name);
-                                out.println(ob);
+                                // out.println(ob);
                                 Object oj = null;
                                 if (field.getType() == java.sql.Date.class) {
                                     oj = java.sql.Date.valueOf(String.valueOf(ob));
@@ -193,7 +193,7 @@ public class Frontservlet extends HttpServlet {
                             request.setAttribute(e.getKey(), e.getValue());
                         }
                         RequestDispatcher rd = request.getRequestDispatcher(mv.getUrl());
-                        // rd.forward(request, response);
+                        rd.forward(request, response);
                     }
                 } catch (Exception e) {
                     e.printStackTrace(out);
