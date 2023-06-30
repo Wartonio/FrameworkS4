@@ -92,10 +92,10 @@ public class Frontservlet extends HttpServlet {
 
                         }
                         o = singletons.get(map.getClassName());
-                        out.println("tay");
+                        out.println("olana be");
                     } else {
                         o = c.getConstructor((Class[]) null).newInstance();
-                        out.println("tsy tay");
+                        out.println("no probleme");
                     }
                     Method[] methods = c.getDeclaredMethods();
                     for (Method method : methods) {
@@ -201,8 +201,29 @@ public class Frontservlet extends HttpServlet {
                         // TODO: handle exception
                     }
 
-                    Object obj = m.invoke(o, objt);
+                    if (m.isAnnotationPresent(Session.class)) {
+                        Method m1 = c.getDeclaredMethod("setSessions",HashMap.class);
+                        HashMap<String,Object> HM = new HashMap<String,Object>();
+                        HttpSession session = request.getSession();
+                        Enumeration<String> attributeNames = session.getAttributeNames();
+                        while (attributeNames.hasMoreElements()) {
+                            String attributeName = attributeNames.nextElement();
+                            Object attributeValue = session.getAttribute(attributeName);
+                            HM.put( attributeName, attributeValue);
+                        }
+                        m1.invoke(o,HM);
+                    }
 
+                    Object obj = m.invoke(o, objt);
+                    if(m.isAnnotationPresent(Session.class)){
+                        Method m1 = c.getDeclaredMethod("getSessions");
+                        
+                        HashMap<String,Object> HM = (HashMap< String, Object>) m1.invoke(o);;
+                        HttpSession session = request.getSession();
+                        for (Map.Entry<String, Object> e : HM.entrySet()) {
+                            request.getSession().setAttribute(e.getKey(), e.getValue());
+                        }
+                    }
                     if (obj instanceof ModelView) {
                         ModelView mv = (ModelView) obj;
                         for (Map.Entry<String, Object> e : mv.getData().entrySet()) {
