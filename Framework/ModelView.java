@@ -6,12 +6,19 @@ public class ModelView {
     String url;
     HashMap<String,Object> data = new HashMap<String,Object>(); 
     HashMap<String,Object> session = new HashMap<String,Object>();
+    Boolean isJSon = false;
   
     public ModelView() {
 
     }
     public void AddItem(String name, Object value){
         this.getData().put(name, value);
+    }
+    public Boolean getIsJSon() {
+        return isJSon;
+    }
+    public void setIsJSon(Boolean isJSon) {
+        this.isJSon = isJSon;
     }
     public String getUrl() {
         return url;
