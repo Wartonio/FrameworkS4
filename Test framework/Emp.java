@@ -105,4 +105,14 @@ public class Emp {
         mv.AddItem("nationalite", "Malagasy");
         return mv;
     }
+    @Annotation(Url = "tous")
+    @RestAPI()
+    public Emp[] GetEmpAll(){
+        Emp[] emps = new Emp[3];
+        emps[0]= new Emp("Rakoto");
+        emps[1]= new Emp("Rabe");
+        emps[2]= new Emp("Rasoa");
+
+        return emps;
+    }
 }
