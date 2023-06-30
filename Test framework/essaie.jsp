@@ -16,7 +16,7 @@ Emp[] employees =(Emp[]) request.getAttribute("all_emp");
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <h1 class="card-title">teste reussi</h1>
+                         <h1 class="card-title">teste reussi</h1>
                         <%for(Emp employee : employees){%>
                             <%=employee.getNom()%>
                             <%=employee.getId()%>

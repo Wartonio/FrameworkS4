@@ -2,6 +2,8 @@ package etu001935.model;
 import etu001935.framework.annotation.*;
 import etu001935.modelView.ModelView;
 import java.sql.Date;
+import java.util.HashMap;
+
 import etu001935.framework.Upload;
 // @Scope(name="singleton")
 public class Emp {
@@ -10,6 +12,8 @@ public class Emp {
     Date date;
     String[] jours;
     Upload fileUpload;
+    HashMap<String,Object> sessions;
+
 
     @Annotation(Url="Getall")
     @Authantification(user="admin")
@@ -27,6 +31,12 @@ public class Emp {
         view.AddItem("Id",id);
         return view;
         
+    }
+    public HashMap<String, Object> getSessions() {
+        return sessions;
+    }
+    public void setSessions(HashMap<String, Object> sessions) {
+        this.sessions = sessions;
     }
     public String[] getJours(){
         return jours;
@@ -65,10 +75,23 @@ public class Emp {
     }
 
     @Annotation(Url = "login")
+    @Session()
     public etu001935.modelView.ModelView login(){
         etu001935.modelView.ModelView mv=new etu001935.modelView.ModelView("Sprint8.jsp");
+        System.out.println(this.getSessions().get("nom"));
         mv.addSession("connecte","eny");
         mv.addSession("user","admin");
+        mv.addSession("nom","beton");
+        return mv;
+    }
+
+    @Annotation(Url = "test_Session")
+    @Session()
+    public etu001935.modelView.ModelView getSession(){
+        etu001935.modelView.ModelView mv=new etu001935.modelView.ModelView("Sprint8.jsp");
+        mv.AddItem("nom",this.getSessions().get("nom"));
+        System.out.println(this.getSessions().get("nom"));
+        this.getSessions().put("nom","zah");
         return mv;
     }
 }
