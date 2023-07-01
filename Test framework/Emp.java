@@ -94,4 +94,15 @@ public class Emp {
         this.getSessions().put("nom","zah");
         return mv;
     }
+
+    @Annotation(Url = "apropos")
+    public etu001935.modelView.ModelView detailEmp()
+    {
+        ModelView mv = new ModelView();
+        mv.setIsJSon(true);
+        mv.AddItem("nom", "tsiresy");
+        mv.AddItem("age", 18);
+        mv.AddItem("nationalite", "Malagasy");
+        return mv;
+    }
 }
