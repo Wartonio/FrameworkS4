@@ -243,6 +243,11 @@ public class Frontservlet extends HttpServlet {
                             RequestDispatcher rd = request.getRequestDispatcher(mv.getUrl());
                             rd.forward(request, response);
                         }
+                    }else if(m.isAnnotationPresent(RestAPI.class)){
+                        response.setContentType("application/json");
+                            response.setCharacterEncoding("UTF-8");
+                            out.println(new Gson().toJson(obj));
+                            out.flush();
                     }
                 } catch (Exception e) {
                     // e.printStackTrace(out);
